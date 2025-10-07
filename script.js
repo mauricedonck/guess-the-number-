@@ -47,6 +47,7 @@ function gameWon() {
 		wonPlayers.shift();	   
 	}
 	wonPlayers.push(name);
+document.getElementById("winners").textContent = wonPlayers.join(", ");
+	
 }
 
-	
