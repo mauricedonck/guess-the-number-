@@ -1,53 +1,84 @@
-// JavaScript Document
-document.addEventListener("DOMContentLoaded", function() {
-	startGame();
-});
+let randomNumber;
+let attemptsLeft = 3;
+let playerName = "";
+let winnersList = [];
 
-let poging =0
-let name="";
-let numberToGuess = null;
-let wonPlayers = [];
-
-function savename(){
-	name=document.getElementById("nameuser").value;
-	console.log(name);
-} 
-
+function savename() {
+    const nameInput = document.getElementById("nameuser").value.trim();
+    if (!nameInput) {
+        alert("Vul je naam in!");
+    } else {
+		playerName = nameInput;
+		document.getElementById("winners").innerHTML = `Welkom ${playerName}! Raad een getal tussen 1 en 10.`;
+		startGame();
+	}
+    
+}
 
 function startGame() {
-	numberToGuess = Math.floor(Math.random()* 10);
-	console.log(numberToGuess)
+    randomNumber = Math.floor(Math.random() * 10) + 1;
+    attemptsLeft = 3;
+    document.getElementById("numberinput").value = "";
+    console.log("Te raden getal:", randomNumber);
 }
 
-
-function inputnumber(){
-	
-	console.log('poging: ' + poging)
-	
-	if (poging >= 3) {
-		alert("Je hebt al 3 pogingen gedaan. Herlaad de pagina om opnieuw te spelen.");
-	} else {
-		let number=document.getElementById("numberinput").value;
-		console.log(number) 
-	
-		if (number == numberToGuess){
-			alert(" nummer is juist!");
-			gameWon();
-			//naam opslaan in array - zodat we laatste 3 succesvolle spelers kunnen tonen
-		}else {
-			alert("helaas het nummer is fout ");
-			poging++;
-
-		}
-	}	
-}
-
-function gameWon() {
-	if(wonPlayers.length == 3) {
-		wonPlayers.shift();	   
+function inputnumber() {
+    if (!playerName) {
+        alert("Vul eerst je naam in!");
+    } else {
+		compareNumbers();		
 	}
-	wonPlayers.push(name);
-document.getElementById("winners").textContent = wonPlayers.join(", ");
-	
+}
+
+function compareNumbers() {
+	const guess = Number(document.getElementById("numberinput").value);
+    const display = document.getElementById("winners");
+	if (attemptsLeft <= 0) {
+			display.innerHTML = `Geen pogingen meer! Het juiste getal was $ {randomNumber}.`;
+			showLastWinners();
+			resetAfterDelay();
+		} else {
+			if (guess === randomNumber) {
+			display.innerHTML = `Gefeliciteerd ${playerName}! Je hebt het getal geraden in ${4 - attemptsLeft} pogingen!`;
+			updateWinners(playerName);
+			showLastWinners();
+			resetAfterDelay();
+			} else {
+				attemptsLeft--;
+				if (attemptsLeft > 0) {
+					display.innerHTML = `Fout! Probeer opnieuw. Je hebt nog ${attemptsLeft} pogingen.`;
+				} else {
+					display.innerHTML = `Helaas! Het juiste getal was ${randomNumber}.`;
+					showLastWinners();
+					resetAfterDelay();
+				}
+			}
+		}
+}
+
+function updateWinners(name) {
+    winnersList.push(name);
+    if (winnersList.length > 3) {
+		winnersList.shift();
+	}
+}
+
+function showLastWinners() {
+    const display = document.getElementById("winners");
+    let html = display.innerHTML + "<br> <br>Laatst 3 winnaars:<ul>";
+    winnersList.forEach(name => {
+        html += `<li>${name}</li>`;
+    });
+    html += "</ul>";
+    display.innerHTML = html;
+}
+
+function resetAfterDelay() {
+    setTimeout(() => {
+        document.getElementById("nameuser").value = "";
+        document.getElementById("numberinput").value = "";
+        document.getElementById("winners").innerHTML = "Vul je naam in om opnieuw te beginnen.";
+        playerName = "";
+    }, 5000);
 }
 
